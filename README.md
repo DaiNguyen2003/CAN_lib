@@ -37,9 +37,9 @@ Thư viện này được thiết kế theo mô hình **Data-Driven** và hỗ t
 graph TD
     Hardware[CAN Transceiver] -->|Raw Signal| STM32[STM32 CAN Controller]
     STM32 -->|RX Interrupt| Callback[HAL_CAN_RxFifo0... in main.c]
-    Callback -->|Switch(CurrentCarProfile)| Process{Chọn Profile Xe}
-    Process -->|Car: VF_LIMO| DecodeLimo[Dùng bảng VF_LIMO_Msg]
-    Process -->|Car: VF789| DecodeVF789[Dùng bảng VF789_Msg]
+    Callback -->|"Switch(CurrentCarProfile)"| Process{Chọn Profile Xe}
+    Process -->|"Car: VF_LIMO"| DecodeLimo[Dùng bảng VF_LIMO_Msg]
+    Process -->|"Car: VF789"| DecodeVF789[Dùng bảng VF789_Msg]
     DecodeLimo -->|Bit Extraction| StructLimo[VF_LIMO_Data]
     DecodeVF789 -->|Bit Extraction| StructVF789[VF789_Data]
 ```
