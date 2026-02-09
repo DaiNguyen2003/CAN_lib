@@ -191,6 +191,29 @@ switch (CurrentCarProfile) {
         if (VF789_Data.CreepMode.Mode_Req == 1) Process_VF789_Creep();
         break;
 }
+
+/* --- Định nghĩa hàm con --- */
+void App_Brake_LED_Control(void)
+{
+    // Truy cập trực tiếp biến toàn cục
+    if (VF_LIMO_Data.Brake.SwitchSts == 1) 
+    {
+         // Đạp phanh -> Bật LED
+         HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
+    }
+    else
+    {
+         // Nhả phanh -> Tắt LED
+         HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
+    }
+}
+
+/* --- Trong vòng lặp chính --- */
+while (1)
+{
+    App_Brake_LED_Control(); // Code trong main() rất gọn
+    HAL_Delay(10);
+}
 ```
 
 ---

@@ -1,0 +1,3 @@
+../Core/Src/can_lib.c:260:6:CAN_Decode_Message	120	static
+../Core/Src/can_lib.c:374:6:CAN_Config_Init	56	static
+../Core/Src/can_lib.c:415:6:CAN_Process_Rx	24	static
