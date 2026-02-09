@@ -169,8 +169,12 @@ void CAN_Config_Init(CAN_HandleTypeDef *hcan);
 typedef enum {
     CAR_VF_LIMO = 0,
     CAR_VF789,
-    // Add more profiles here
+    CAR_VF5
 } CarProfile_t;
+
+extern CAN_Data_t VF5_Data;
+extern const CAN_Message VF5_Msg[];
+extern const uint16_t SIZE_VF5_Msg;
 
 extern CarProfile_t CurrentCarProfile;
 

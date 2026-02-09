@@ -10,7 +10,9 @@
 
 
 CAN_Data_t VF_LIMO_Data;
+CAN_Data_t VF_LIMO_Data;
 CAN_Data_t VF789_Data;
+CAN_Data_t VF5_Data;
 CarProfile_t CurrentCarProfile = CAR_VF_LIMO; // Default Profile
 
 const CAN_Message VF789_Msg[] =
@@ -247,6 +249,70 @@ const CAN_Message VF_LIMO_Msg[] =
    
 };
 
+/* ============================================================================
+ * VF5 Signal 
+ * ============================================================================ */
+const CAN_Message VF5_Msg[] =
+{
+    /* ================= BRAKE SYSTEM ================= */
+    /* VCU_HMI_0x1A9 - ID 0x1A9 (Brake Switch) */
+    { .Name = Brake_Msg, .ID = 0x1A9, .Number_Signal = 1,
+      .Signal = { 
+          { .name = Brake_SwitchSts_Sig, .start_bit = 63, .length = 2, .is_signed = 0, .endian = CAN_MOTOROLA, .factor = 1.0f, .offset = 0.0f }
+      } 
+    },
+
+    /* VCU_Sts2_0x379 - ID 0x379 (Brake Pedal, Gear Actual) */
+    { .Name = Brake_Msg, .ID = 0x379, .Number_Signal = 2,
+      .Signal = { 
+          { .name = Brake_PedlVal_Sig, .start_bit = 47, .length = 8, .is_signed = 0, .endian = CAN_MOTOROLA, .factor = 0.4f, .offset = 0.0f },
+          { .name = Gear_Actual_Sig, .start_bit = 26, .length = 3, .is_signed = 0, .endian = CAN_MOTOROLA, .factor = 1.0f, .offset = 0.0f }
+      } 
+    },
+
+    /* ================= KEY/TERMINAL SYSTEM ================= */
+    /* GW_BCM_CLAMP_STAT_0x112 - ID 0x112 */
+    { .Name = STAT_Terminal_Msg, .ID = 0x112, .Number_Signal = 1,
+      .Signal = { 
+          { .name = STAT_Terminal_Sig, .start_bit = 34, .length = 3, .is_signed = 0, .endian = CAN_MOTOROLA, .factor = 1.0f, .offset = 0.0f }
+      } 
+    },
+
+    /* ================= HV BATTERY SYSTEM ================= */
+    /* BMS_Sts_0x215 - ID 0x215 (HV Status, SOC) */
+    { .Name = HV_Msg, .ID = 0x215, .Number_Signal = 3,
+      .Signal = { 
+          { .name = HV_OnOff_STS_Sig, .start_bit = 19, .length = 2, .is_signed = 0, .endian = CAN_MOTOROLA, .factor = 1.0f, .offset = 0.0f },
+          { .name = HV_Sts_Sig, .start_bit = 63, .length = 8, .is_signed = 0, .endian = CAN_MOTOROLA, .factor = 1.0f, .offset = 0.0f },
+          { .name = LV_SOC_Sig, .start_bit = 25, .length = 10, .is_signed = 0, .endian = CAN_MOTOROLA, .factor = 0.1f, .offset = 0.0f } // BMS_SocActual_EST
+      } 
+    },
+
+    /* ================= DCDC & LV BAT SYSTEM ================= */
+    /* DCDC_Sts_0x20B - ID 0x20B (DCDC Out V/I/Status) */
+    { .Name = DCDC_Msg, .ID = 0x20B, .Number_Signal = 2,
+      .Signal = { 
+          { .name = DCDC_Voltage_Sig, .start_bit = 45, .length = 10, .is_signed = 0, .endian = CAN_MOTOROLA, .factor = 1.0f, .offset = 0.0f },
+          { .name = DCDC_Current_Sig, .start_bit = 31, .length = 8, .is_signed = 0, .endian = CAN_MOTOROLA, .factor = 1.0f, .offset = 0.0f }
+      } 
+    },
+
+    /* ================= CREEP MODE ================= */
+    /* VCU_EDSControl_0x229 - ID 0x229 */
+    { .Name = CreepMode_Msg, .ID = 0x229, .Number_Signal = 1,
+      .Signal = { 
+          { .name = Creep_Flag_FWD_Sig, .start_bit = 51, .length = 1, .is_signed = 0, .endian = CAN_MOTOROLA, .factor = 1.0f, .offset = 0.0f }
+      } 
+    },
+
+    /* VCU_HMI_charging_0x3E0 - ID 0x3E0 */
+    { .Name = CreepMode_Msg, .ID = 0x3E0, .Number_Signal = 1,
+      .Signal = { 
+          { .name = Creep_Disable_Sts_Sig, .start_bit = 56, .length = 1, .is_signed = 0, .endian = CAN_MOTOROLA, .factor = 1.0f, .offset = 0.0f }
+      } 
+    },
+};
+
 
 /**
   * @brief  Decode Generic CAN Message
@@ -405,6 +471,7 @@ void CAN_Config_Init(CAN_HandleTypeDef *hcan)
 /* Exported sizes for external use */
 const uint16_t SIZE_VF789_Msg = sizeof(VF789_Msg) / sizeof(CAN_Message);
 const uint16_t SIZE_VF_LIMO_Msg = sizeof(VF_LIMO_Msg) / sizeof(CAN_Message);
+const uint16_t SIZE_VF5_Msg = sizeof(VF5_Msg) / sizeof(CAN_Message);
 
 /**
   * @brief  Process Received CAN Message based on Current Profile
@@ -422,6 +489,10 @@ void CAN_Process_Rx(uint32_t ID, uint8_t *RxData)
 
         case CAR_VF789:
             CAN_Decode_Message(ID, RxData, VF789_Msg, sizeof(VF789_Msg)/sizeof(CAN_Message), &VF789_Data);
+            break;
+
+        case CAR_VF5:
+            CAN_Decode_Message(ID, RxData, VF5_Msg, sizeof(VF5_Msg)/sizeof(CAN_Message), &VF5_Data);
             break;
 
         default:
